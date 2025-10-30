@@ -1,11 +1,11 @@
-// Chaotic Geocacher RPG — v3: decode fix UX, completion indicator, dev unlock
+// Geocacher RPG
 (() => {
   // ========= Elements =========
   const $ = s => document.querySelector(s);
   const el = {
     explore: $('#explore'), story: $('#story'), stats: $('#stats'),
     btnTrain: $('#btnTrain'), btnBoss: $('#btnBoss'), btnCont: $('#btnContinueBoss'),
-    btnDevUnlock: $('#btnDevUnlock'),
+    // btnDevUnlock: $('#btnDevUnlock'), // uncomment if want the dev button to unlock all moves
     battle: $('#battle'), battleTitle: $('#battleTitle'), eHP: $('#eHP'),
     moves: $('#moves'), btnEscape: $('#btnEscape'), hint: $('#hint'),
     phase: $('#phase'), log: $('#log'), statusBanner: $('#statusBanner')
@@ -47,25 +47,29 @@
 
   // Training enemies
   const TRAINING = [
-    {name:'Mosquito Swarm',      hp:16, power:4},
-    {name:'Suspicious Neighbor', hp:20, power:5},
-    {name:'Unscramble Beast',    hp:18, power:5},
-    {name:'Camouflaged Bolt',    hp:18, power:6}
+    {name:'Mosquito Swarm',      hp:16, power:4, flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Suspicious Dog Walker', hp:20, power:5, flavor: "HEY! Why are you peering back there?"},
+    {name:'Unscramble Beast',    hp:18, power:5, flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Camouflaged Bolt',    hp:18, power:6, flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Menacing Bush',    hp:10, power:5, flavor: "Looks like it wants you dead."},
+    {name:'Spider Web',    hp:10, power:5, flavor: "Hidden in plain sight, will catch you by surprise."},
+    {name:'Park Ranger',    hp:10, power:5, flavor: "Suspicious of your every move."},
+    {name:'Dark Tunnel',    hp:10, power:5, flavor: "Envelopes you in darkness."}
   ];
 
   // ===== Fixed 10-Boss Final Challenge =====
   // Each boss specifies the ONE correct move name required.
   const BOSS_ORDER = [
-    {name:'Dog Walker',            hp:22, power:10, correct:'Avoid Muggles'},
-    {name:'Poison Ivy Spirit',     hp:24, power:10, correct:'Apply Insect Repellent'},
-    {name:'Mall Cop',              hp:24, power:10, correct:'Hide in Plain Sight'},
-    {name:'Unscramble Wraith',     hp:24, power:10, correct:'Squint Extra Hard'},
-    {name:'Giant Tree Cache',      hp:28, power:11, correct:'Tree Climb'},
-    {name:'Nano Cache Gnome',      hp:26, power:11, correct:'Tweezers Technique'},
-    {name:'Dark Tunnel Gremlin',   hp:26, power:11, correct:'Flashlight'},
-    {name:'Mystery Cache Golem',   hp:28, power:12, correct:'Phone-a-Friend'},
-    {name:'Rockslide Sentinel',    hp:28, power:12, correct:'Lift a Rock'},
-    {name:'Compass Poltergeist',   hp:26, power:12, correct:'Compass Consult'},
+    {name:'Dog Walker',            hp:50, power:10, correct:'Avoid Muggles', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Poison Ivy Spirit',     hp:50, power:10, correct:'Apply Insect Repellent', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Mall Cop',              hp:60, power:10, correct:'Hide in Plain Sight', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Unscramble Wraith',     hp:60, power:10, correct:'Squint Extra Hard', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Giant Tree Cache',      hp:70, power:11, correct:'Tree Climb', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Nano Cache Gnome',      hp:70, power:11, correct:'Tweezers Technique', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Dark Tunnel Gremlin',   hp:80, power:11, correct:'Flashlight', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Mystery Cache Golem',   hp:80, power:12, correct:'Phone-a-Friend', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Rockslide Sentinel',    hp:90, power:12, correct:'Lift a Rock', flavor: "An airborne army thirsty for cacher blood."},
+    {name:'Compass Poltergeist',   hp:100, power:12, correct:'Compass Consult', flavor: "An airborne army thirsty for cacher blood."},
   ];
   // IMPORTANT: In this build, the correct move IDs for encryption are:
   // [0, 1, 11, 18, 20, 21, 8, 16, 14, 5]
@@ -106,7 +110,7 @@
     el.statusBanner.classList.add('completed');
     el.phase.textContent = 'Completed';
     el.story.textContent = '🎉 Final Challenge complete! Prize awarded.';
-    log('🏆 FINAL CHALLENGE COMPLETE — prize awarded.');    
+    log('🏆 FINAL CHALLENGE COMPLETE — prize awarded. Refresh website to play again.');    
     // After completion, allow free training or replay; keep buttons visible.
   }
 
@@ -147,7 +151,7 @@
     showBattle();
     el.battleTitle.textContent = `Fighting ${state.enemy.name}! ${state.isBoss?'(Final Challenge)':''}`;
     el.eHP.textContent = state.enemy.hp;
-    el.hint.textContent = state.isBoss ? 'Choose wisely… a wrong move = DNF crater.' : '';
+    el.hint.textContent = state.isBoss ? 'Choose wisely… a wrong move will lead to your demise' : '';
     el.moves.innerHTML = '';
     state.player.moves.forEach((moveId)=>{
       const m = MOVES[moveId];
@@ -156,7 +160,7 @@
       b.addEventListener('click',()=> performMove(moveId));
       el.moves.appendChild(b);
     });
-    log(`You engage ${state.enemy.name}! ${state.isBoss? 'The boss run is unforgiving.' : 'Training time.'}`);
+    log(`You engage ${state.enemy.name}! ${state.enemy.flavor} What will you do?`);
   }
 
   function endBattle(win){
@@ -167,7 +171,7 @@
       log(`${state.enemy.name} defeated!`);
       if (state.isBoss) {
         if (state.bossQueue.length) {
-          el.story.textContent = `Boss stage cleared! ${state.bossQueue.length} to go. Breathe, goblin hero.`;
+          el.story.textContent = `Boss stage cleared! ${state.bossQueue.length} to go. Breathe, hero.`;
           el.btnCont?.classList.remove('hidden');
         } else {
           // Completed all 10 bosses — attempt to reveal prize
@@ -188,7 +192,7 @@
       el.btnBoss?.classList.remove('hidden');
       if (el.btnTrain) el.btnTrain.disabled = false;
       if (el.btnBoss) el.btnBoss.disabled = false;
-      el.story.textContent='💀 You DNFed spectacularly, then recovered at base camp. Train up and try again.';
+      el.story.textContent='You were forced to log the DNF, then recovered (emotionally and physically) back at your HQ. Train up and try again.';
     }
 
     paintStats();
@@ -199,7 +203,7 @@
     const m = MOVES[moveId];
     const base = m.power;
     let mult = 1;
-    if(state.isBoss){ mult = (m.name===state.enemy.correct) ? 2 : 1; }
+    if(state.isBoss){ mult = (m.name===state.enemy.correct) ? 10 : 1; }
 
     log(`You use ${m.name}! ${m.quip}`);
     if(state.isBoss){
@@ -222,7 +226,7 @@
     // Enemy counterattack
     if(state.isBoss && m.name!==state.enemy.correct){
       state.player.hp = 0;
-      log(`${state.enemy.name} unleashes a catastrophic counter! You are obliterated into a DNF crater.`);
+      log(`${state.enemy.name} unleashes a catastrophic counter! You are forced to log a DNF.`);
     } else {
       state.player.hp -= state.enemy.power;
       log(`${state.enemy.name} hits back for ${state.enemy.power}! (Your HP ${Math.max(0,state.player.hp)}/${state.player.maxhp})`);
@@ -248,7 +252,7 @@
           log(`LEVEL UP! Now LV ${state.player.lvl}. Learned **${MOVES[nextId].name}**!`);
         }
       } else {
-        log(`LEVEL UP! Now LV ${state.player.lvl}. You radiate goblin energy.`);
+        log(`LEVEL UP! Now LV ${state.player.lvl}. No more moves to learn.`);
       }
     }
     paintStats();
@@ -298,10 +302,7 @@
       console.error("Decrypt failed:", e);
       alert([
         "Could not decode prize.",
-        "Check these:",
-        "• Did you encrypt with the exact sequence: 0-1-11-18-20-21-8-16-14-5 ?",
-        "• Is IV a 12‑byte AES‑GCM IV from the tool?",
-        "• Did each boss’s FINAL hit use the correct move?"
+        "Did you use the correct move against each boss?"
       ].join("\n"));
     }
   }
@@ -337,20 +338,20 @@
         log("No escape from the Final Challenge. Face your fate.");
         return;
       }
-      log('You yeet yourself away. Coward.');
+      log('You scurry away...');
       endBattle(false);
     });
     // Dev: unlock all moves instantly for testing
-    el.btnDevUnlock?.addEventListener('click', ()=>{
-      state.player.moves = MOVES.map((_,i)=>i);
-      state.player.learnPtr = UNLOCK_ORDER.length;
-      log('🛠 Dev: All moves unlocked for testing.');
-      if(state.mode==='battle') beginBattle(); // refresh buttons
-      else paintStats();
-    });
+    // el.btnDevUnlock?.addEventListener('click', ()=>{
+    //   state.player.moves = MOVES.map((_,i)=>i);
+    //   state.player.learnPtr = UNLOCK_ORDER.length;
+    //   log('🛠 Dev: All moves unlocked for testing.');
+    //   if(state.mode==='battle') beginBattle(); // refresh buttons
+    //   else paintStats();
+    // });
   }
 
   // ========= Init =========
-  function init(){ paintStats(); log('Welcome, chaotic cacher! Beat the 10-boss gauntlet to unlock the final coordinates.'); }
+  function init(){ paintStats(); log('Welcome, cacher! Beat the 10-boss gauntlet in the Final Challenge to unlock the final coordinates.'); }
   init(); wire();
 })();
