@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chaotic Geocacher RPG</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Explore Screen -->
+    <div class="card" id="explore">
+      <div id="story">Train to unlock moves, then attempt the Final Challenge. Defeat all 10 bosses to claim your prize.</div>
+      <div class="hstack" style="margin-top:8px">
+        <button id="btnTrain">Train</button>
+        <button id="btnBoss">Attempt Final Challenge</button>
+        <button id="btnContinueBoss" class="hidden">Continue Boss Run</button>
+        <button id="btnDevUnlock" class="dev">Dev: Unlock All</button>
+        <span class="small" id="stats">LV 1 • HP 30/30 • EXP 0</span>
+      </div>
+    </div>
+
+    <!-- Battle Screen -->
+    <div class="card hidden" id="battle">
+      <div class="hstack"><strong id="battleTitle">Fight!</strong><span class="small">Enemy HP: <span id="eHP">0</span></span></div>
+      <div id="moves" style="margin-top:8px"></div>
+      <div class="hstack" style="margin-top:8px">
+        <button id="btnEscape">Flee like a goblin</button>
+        <span class="small" id="hint"></span>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card">
+      <div class="hstack"><strong id="statusBanner">Log</strong><span class="small" id="phase">Exploration</span></div>
+      <div id="log"></div>
+    </div>
+  </div>
+</body>
+</html>
