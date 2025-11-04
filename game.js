@@ -14,71 +14,105 @@
 
   // ========= Moves =========
   // Master move list (stable index = id)
-  const MOVES = [
-    {name:'Avoid Muggles',  power:12, quip:'You casually pretend you’re not weird.'},                  // 0
-    {name:'Apply Insect Repellent', power:8, quip:'Mosquitoes perish; you smell like victory and chemicals.'}, // 1
-    {name:'Bushwhack',      power:10, quip:'You karate-chop flora like a confused ninja.'},            // 2
-    {name:'Bring Snacks',   power:0,  quip:'Morale increases. Calories magically appear.'},            // 3
-    {name:'Check the Hint', power:6,  quip:'You squint at the cryptic clue… hmm.'},                    // 4
-    {name:'Compass Consult',power:7,  quip:'You spin dramatically and point with confidence.'},        // 5
-    {name:'Decrypt Clue',   power:9,  quip:'ROT13 flex engaged.'},                                     // 6
-    {name:'Eagle-Eye Scan', power:8,  quip:'Hawk vision acquired (you hope).'},                        // 7
-    {name:'Flashlight',     power:11, quip:'You illuminate mysteries and three spiders.'},             // 8
-    {name:'Fake a Phone Call',power:0,quip:'“Yes hello I am normal.”'},                                // 9
-    {name:'Gloves On',      power:0,  quip:'Tactically fearless fingers.'},                            //10
-    {name:'Hide in Plain Sight', power:13, quip:'You become a bench.'},                                //11
-    {name:'Investigate Suspicious Rock', power:9, quip:'The rock claims innocence.'},                  //12
-    {name:'Jam Logbook Closed', power:7, quip:'Micro dominance asserted.'},                            //13
-    {name:'Lift a Rock',    power:15, quip:'You upend geology like a raccoon god.'},                   //14
-    {name:'Look Underbench',power:8,  quip:'Classic geocacher posture.'},                              //15
-    {name:'Phone-a-Friend', power:18, quip:'Your friend solves it instantly. Rude.'},                  //16
-    {name:'Parkour!!!',     power:12, quip:'Unnecessary flips encouraged.'},                           //17
-    {name:'Squint Extra Hard', power:10, quip:'Pixels enhance. Brain… not so much.'},                  //18
-    {name:'Stealth Mode',   power:14, quip:'You are the shrubbery.'},                                  //19
-    {name:'Tree Climb',     power:16, quip:'Defy gravity & squirrels.'},                               //20
-    {name:'Tweezers Technique', power:22, quip:'Micros tremble.'},                                     //21
-    {name:'Trackable Toss', power:22, quip:'A shiny travel bug arcs through destiny.'},                //22
+  // const MOVES = [
+  //   {name:'Avoid Muggles',  power:12, quip:'You casually pretend you’re not weird.'},                  // 0
+  //   {name:'Apply Insect Repellent', power:8, quip:'Mosquitoes perish; you smell like victory and chemicals.'}, // 1
+  //   {name:'Bushwhack',      power:10, quip:'You karate-chop flora like a confused ninja.'},            // 2
+  //   {name:'Bring Snacks',   power:0,  quip:'Morale increases. Calories magically appear.'},            // 3
+  //   {name:'Check the Hint', power:6,  quip:'You squint at the cryptic clue… hmm.'},                    // 4
+  //   {name:'Compass Consult',power:7,  quip:'You spin dramatically and point with confidence.'},        // 5
+  //   {name:'Decrypt Clue',   power:9,  quip:'ROT13 flex engaged.'},                                     // 6
+  //   {name:'Eagle-Eye Scan', power:8,  quip:'Hawk vision acquired (you hope).'},                        // 7
+  //   {name:'Flashlight',     power:11, quip:'You illuminate mysteries and three spiders.'},             // 8
+  //   {name:'Fake a Phone Call',power:0,quip:'“Yes hello I am normal.”'},                                // 9
+  //   {name:'Gloves On',      power:0,  quip:'Tactically fearless fingers.'},                            //10
+  //   {name:'Hide in Plain Sight', power:13, quip:'You become a bench.'},                                //11
+  //   {name:'Investigate Suspicious Rock', power:9, quip:'The rock claims innocence.'},                  //12
+  //   {name:'Jam Logbook Closed', power:7, quip:'Micro dominance asserted.'},                            //13
+  //   {name:'Lift a Rock',    power:15, quip:'You upend geology like a raccoon god.'},                   //14
+  //   {name:'Look Underbench',power:8,  quip:'Classic geocacher posture.'},                              //15
+  //   {name:'Phone-a-Friend', power:18, quip:'Your friend solves it instantly. Rude.'},                  //16
+  //   {name:'Parkour!!!',     power:12, quip:'Unnecessary flips encouraged.'},                           //17
+  //   {name:'Squint Extra Hard', power:10, quip:'Pixels enhance. Brain… not so much.'},                  //18
+  //   {name:'Stealth Mode',   power:14, quip:'You are the shrubbery.'},                                  //19
+  //   {name:'Tree Climb',     power:16, quip:'Defy gravity & squirrels.'},                               //20
+  //   {name:'Tweezers Technique', power:22, quip:'Micros tremble.'},                                     //21
+  //   {name:'Trackable Toss', power:22, quip:'A shiny travel bug arcs through destiny.'},                //22
+  // ];
+
+   const MOVES = [
+    {name:'Check GPS', power:6,  quip:'You check the coordinates...again.'},                                  // 0
+    {name:'Phone-a-Friend', power:18, quip:'Your friend solves it instantly. Rude.'},                  // 1
+    {name:'Hide in Plain Sight', power:13, quip:'You put on your invisibility cloak and vanish.'},     // 2
+    {name:'Flashlight',     power:11, quip:'You illuminate mysteries and three spiders.'},             // 3
+    {name:'Poke',     power:11, quip:'Poke.'},                                                        // 4
+    {name:'Replacement',     power:11, quip:'You replace the log.'},                                  // 5
+    {name:'Snack',   power:0,  quip:'Morale increases. Calories magically appear.'},                 // 6
+    {name:'Bug Spray', power:8, quip:'Mosquitoes perish; you smell like victory and chemicals.'},     // 7
+    {name:'Bushwhack',      power:10, quip:'You charge and karate-chop like a confused ninja.'},      // 8
+    {name:'Eagle-Eye Scan', power:8,  quip:'Hawk vision acquired (you hope).'},                        // 9
   ];
 
   // Explicit unlock order (by move id). Start with only the FIRST entry as the initial move.
-  const UNLOCK_ORDER = [4, 0, 2, 8, 21, 11, 18, 1, 20, 14, 16, 5, 22, 7, 6, 12, 15, 17, 3, 9, 10, 13];
-  //                Start: CheckHint(4), then Avoid(0), Bushwhack(2), Flashlight(8), Tweezers(21),
-  //                Hide(11), Squint(18), Apply Repellent(1), Tree Climb(20), Lift(14), Phone(16), Compass(5), etc.
+  const UNLOCK_ORDER = [0, 1, 2, 3, 4, 5, 6, 7];
 
   // Training enemies
   const TRAINING = [
     {name:'Mosquito Swarm',      hp:16, power:4, flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Suspicious Dog Walker', hp:20, power:5, flavor: "HEY! Why are you peering back there?"},
-    {name:'Unscramble Beast',    hp:18, power:5, flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Camouflaged Bolt',    hp:18, power:6, flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Menacing Bush',    hp:10, power:5, flavor: "Looks like it wants you dead."},
+    //{name:'Dog Walker', hp:20, power:5, flavor: "HEY! Why are you peering in there?"},
+    {name:'GPS Drift',    hp:18, power:5, flavor: "Moves the coordinates every 3 seconds."},
+    {name:'False Trail Sign',    hp:18, power:6, flavor: "Laughs as you walk 50m the wrong way."},
+    {name:'Big Bush',    hp:10, power:5, flavor: "Looks like it wants you dead."},
     {name:'Spider Web',    hp:10, power:5, flavor: "Hidden in plain sight, will catch you by surprise."},
     {name:'Park Ranger',    hp:10, power:5, flavor: "Suspicious of your every move."},
-    {name:'Dark Tunnel',    hp:10, power:5, flavor: "Envelopes you in darkness."}
+    {name:'Dark Tunnel',    hp:10, power:5, flavor: "Envelopes you in darkness."},
+    {name:'Wild Hog',    hp:10, power:5, flavor: "Not thrilled you are digging in ITS dirt."},
+    {name:'Mall Cop',    hp:10, power:5, flavor: "What are you doing behind that dumpster??"},
+    {name:'Chatty Tourist',    hp:10, power:5, flavor: "Blocks ground zero with enthusiasm."},
+    //{name:'Soggy Log',    hp:10, power:5, flavor: "Nice try, but you can't sign ME."},
+    {name:'Solution Checker',    hp:10, power:5, flavor: "Those coordinates are not correct, you have 1 try left."},
+    {name:'Menacing Mud',    hp:10, power:5, flavor: "Your clean shoes are a distant memory."},
+    //{name:'JeffGamer Puzzle',    hp:10, power:5, flavor: "Thrives on your suffering, solved only by accident."},
+    {name:'Menacing Mud',    hp:10, power:5, flavor: "Your clean shoes are a distant memory."},
+    //{name:'Slithering Snake',    hp:10, power:5, flavor: "Eager to catch its next meal."},
+    {name:'Devious Bench',    hp:10, power:5, flavor: "Pretends there's no cache under there..."},
+    {name:'Cursed Hollow Tree',    hp:10, power:5, flavor: "Hiding something, won't tell you what."},
+    //{name:'Banyan Tree',    hp:10, power:5, flavor: "Absolutely full of hidey holes... Looms with smugness."},
+
   ];
 
-  // ===== Fixed 10-Boss Final Challenge =====
-  // Each boss specifies the ONE correct move name required.
-  const BOSS_ORDER = [
-    {name:'Dog Walker',            hp:50, power:10, correct:'Avoid Muggles', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Poison Ivy Spirit',     hp:50, power:10, correct:'Apply Insect Repellent', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Mall Cop',              hp:60, power:10, correct:'Hide in Plain Sight', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Unscramble Wraith',     hp:60, power:10, correct:'Squint Extra Hard', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Giant Tree Cache',      hp:70, power:11, correct:'Tree Climb', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Nano Cache Gnome',      hp:70, power:11, correct:'Tweezers Technique', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Dark Tunnel Gremlin',   hp:80, power:11, correct:'Flashlight', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Mystery Cache Golem',   hp:80, power:12, correct:'Phone-a-Friend', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Rockslide Sentinel',    hp:90, power:12, correct:'Lift a Rock', flavor: "An airborne army thirsty for cacher blood."},
-    {name:'Compass Poltergeist',   hp:100, power:12, correct:'Compass Consult', flavor: "An airborne army thirsty for cacher blood."},
+  // ====== Quips ======
+  // Keys are "Enemy Name|Move Name". Values can be a string or an object with phases.
+const REACTIONS = {
+  // Visibility / terrain
+  "Dark Tunnel|Flashlight": {
+    use: "You sweep the beam through the void…",
+    hit: "Shadows scatter. A tiny container winks back.",
+    defeat: "The tunnel yields its secret and sulks."
+  },
+  "Spider Web|Poke": {
+    use: "You test the silk with a careful prod.",
+    hit: "It snaps with a spiteful twang.",
+    defeat: "Web cleared. Dignity not so much."
+  },
+};
+
+  // ===== 5-Boss Final Challenge =====
+   const BOSS_ORDER = [
+    {name:'JeffGamer Puzzle',      hp:50, power:10, correct:'Phone-a-Friend', flavor: "Thrives on your suffering, solved only by accident."},
+    {name:'Banyan Tree',           hp:50, power:10, correct:'Poke', flavor: "Absolutely full of hidey holes... Looms with smugness."},
+    {name:'Dog Walker',            hp:60, power:10, correct:'Hide in Plain Sight', flavor: "HEY! Why are you peering in there?"},
+    {name:'Slithering Snake',      hp:60, power:10, correct:'GPS', flavor: "Eager to catch its next meal."},
+    {name:'Soggy Log',             hp:70, power:11, correct:'Replacement', flavor: "Nice try, but you can't sign ME."},
   ];
   // IMPORTANT: In this build, the correct move IDs for encryption are:
-  // [0, 1, 11, 18, 20, 21, 8, 16, 14, 5]
-  // Encrypt your coordinates with exactly: "0-1-11-18-20-21-8-16-14-5"
+  // [1, 4, 2, 0, 5]
+  // Encrypt your coordinates with exactly: "1-4-2-0-5"
 
   // ========= Encrypted Coordinates (client-only) =========
-  // Replace these using your encryptor with the above sequence. Placeholder = harmless text.
-  const CIPHERTEXT_B64 = "4XvzyzBRlonE7nRjCpnTzsbGoJXkE0iPafGoYCr3ax3DZdSfHfOF";
-  const IV_B64 = "fgCljugwvNjFhqv/";
+  // Replace these using your encryptor with the above sequence.
+  const CIPHERTEXT_B64 = "BRup+OMz5d2DdFiKFpmY7zZYI8bboZJxQzL70EShM8/mL8MC/y7m";
+  const IV_B64 = "wLMnZjpghT6Pkp8Z";
 
   // ========= State =========
   const state = {
@@ -87,7 +121,7 @@
       hp:30,
       lvl:1,
       exp:0,
-      moves:[ UNLOCK_ORDER[0] ],  // start with ONE move (Check the Hint)
+      moves:[ UNLOCK_ORDER[0] ],  // start with ONE move
       learnPtr: 1
     },
     enemy:null,
@@ -174,7 +208,7 @@
           el.story.textContent = `Boss stage cleared! ${state.bossQueue.length} to go. Breathe, hero.`;
           el.btnCont?.classList.remove('hidden');
         } else {
-          // Completed all 10 bosses — attempt to reveal prize
+          // Completed all 5 bosses — attempt to reveal prize
           // Update UI to completed *before* the blocking alert to ensure it sticks.
           setCompletedUI();
           tryRevealPrize(); // popup
@@ -229,7 +263,7 @@
       log(`${state.enemy.name} unleashes a catastrophic counter! You are forced to log a DNF.`);
     } else {
       state.player.hp -= state.enemy.power;
-      log(`${state.enemy.name} hits back for ${state.enemy.power}! (Your HP ${Math.max(0,state.player.hp)}/${state.player.maxhp})`);
+      log(`→ ${state.enemy.name} hits back for ${state.enemy.power}! (Your HP ${Math.max(0,state.player.hp)}/${state.player.maxhp})\nWhat will you do?`);
     }
 
     if(state.player.hp<=0){ endBattle(false); return; }
@@ -352,6 +386,6 @@
   }
 
   // ========= Init =========
-  function init(){ paintStats(); log('Welcome, cacher! Beat the 10-boss gauntlet in the Final Challenge to unlock the final coordinates.'); }
+  function init(){ paintStats(); log('Welcome, cacher! Beat the 5-boss gauntlet in the Final Challenge to unlock the final coordinates.'); }
   init(); wire();
 })();
