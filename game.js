@@ -334,7 +334,7 @@ const REACTIONS = {
     state.player.moves.forEach((moveId)=>{
       const m = MOVES[moveId];
       const b = document.createElement('button');
-      b.textContent = `${m.name} (${m.power})`;
+      b.textContent = `${m.name}`;
       b.addEventListener('click',()=> performMove(moveId));
       el.moves.appendChild(b);
     });
@@ -429,10 +429,11 @@ const REACTIONS = {
     }
 
     // damage, defeat, counterattack
-    let mult = 1;
-    if (isBoss) mult = correct ? 10 : 1;
+    let mult = base;
+    if (isBoss) mult = correct ? 2*state.enemy.maxhp : base;
 
-    const dmg = Math.max(1, Math.floor(base * mult));
+    //const dmg = Math.max(0, Math.floor(base * mult));
+    const dmg = Math.max(base, mult)
     state.enemy.hp = Math.max(0, state.enemy.hp - dmg);
     el.eHP.textContent = state.enemy.hp;
     log(`→ ${state.enemy.name} takes ${dmg} damage. (Enemy HP: ${state.enemy.hp}/${state.enemy.maxhp})`);
@@ -494,7 +495,12 @@ const REACTIONS = {
     state.bossQueue = BOSS_ORDER.map(x=>({...x})); // fixed order
     state.bossActive = true; state.isBoss = true;
     state.bossHistory = [];
-    state.enemy = state.bossQueue.shift();
+    //state.enemy = state.bossQueue.shift();
+    const base = state.bossQueue.shift();
+    state.enemy = {... base,
+                      hp: base.hp,
+                      maxhp: base.hp
+                    }
     beginBattle();
   }
 
@@ -502,7 +508,12 @@ const REACTIONS = {
     if(state.bossActive && state.bossQueue.length){
       el.btnCont?.classList.add('hidden');
       state.isBoss = true;
-      state.enemy = state.bossQueue.shift();
+      //state.enemy = state.bossQueue.shift();
+      const base = state.bossQueue.shift();
+      state.enemy = {... base,
+                         hp: base.hp,
+                         maxhp: base.hp
+                      }
       beginBattle();
     } else {
       el.btnCont?.classList.add('hidden');
