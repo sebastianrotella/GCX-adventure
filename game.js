@@ -41,10 +41,10 @@
   // ];
 
    const MOVES = [
-    {name:'Check GPS', power:6,  quip:'You check the coordinates...again.'},                                  // 0
-    {name:'Phone-a-Friend', power:18, quip:'Your friend solves it instantly. Rude.'},                  // 1
-    {name:'Hide in Plain Sight', power:13, quip:'You put on your invisibility cloak and vanish.'},     // 2
-    {name:'Flashlight',     power:11, quip:'You illuminate mysteries and three spiders.'},             // 3
+    {name:'Check GPS', power:6,  quip:"Your confidence rises. The enemy's ego is hurt."},                                  // 0
+    {name:'Phone-a-Friend', power:18, quip:'Your friend jumps in and throws a punch.'},                  // 1
+    {name:'Hide in Plain Sight', power:13, quip:'You put on your invisibility cloak and vanish. Enemy is hurt by confusion.'},     // 2
+    {name:'Flashlight',     power:11, quip:'You blind the enemy.'},                                   // 3
     {name:'Poke',     power:11, quip:'Poke.'},                                                        // 4
     {name:'Replacement',     power:11, quip:'You replace the log.'},                                  // 5
     {name:'Snack',   power:0,  quip:'Morale increases. Calories magically appear.'},                 // 6
@@ -73,7 +73,7 @@
     {name:'Solution Checker',    hp:10, power:5, flavor: "Those coordinates are not correct, you have 1 try left."},
     {name:'Menacing Mud',    hp:10, power:5, flavor: "Your clean shoes are a distant memory."},
     //{name:'JeffGamer Puzzle',    hp:10, power:5, flavor: "Thrives on your suffering, solved only by accident."},
-    {name:'Menacing Mud',    hp:10, power:5, flavor: "Your clean shoes are a distant memory."},
+    //{name:'Menacing Mud',    hp:10, power:5, flavor: "Your clean shoes are a distant memory."},
     //{name:'Slithering Snake',    hp:10, power:5, flavor: "Eager to catch its next meal."},
     {name:'Devious Bench',    hp:10, power:5, flavor: "Pretends there's no cache under there..."},
     {name:'Cursed Hollow Tree',    hp:10, power:5, flavor: "Hiding something, won't tell you what."},
@@ -84,17 +84,57 @@
   // ====== Quips ======
   // Keys are "Enemy Name|Move Name". Values can be a string or an object with phases.
 const REACTIONS = {
-  // Visibility / terrain
+  // Flashlight
   "Dark Tunnel|Flashlight": {
-    use: "You sweep the beam through the void…",
+    use: "You sweep the beam through the void and illuminate its deepest secrets.",
     hit: "Shadows scatter. A tiny container winks back.",
     defeat: "The tunnel yields its secret and sulks."
   },
-  "Spider Web|Poke": {
-    use: "You test the silk with a careful prod.",
-    hit: "It snaps with a spiteful twang.",
-    defeat: "Web cleared. Dignity not so much."
+
+  // Check GPS
+  "GPS Drift|Check GPS": {
+    use: "You check the coordinates... again.",
+    hit: "TODO",
+    defeat: "TODO"
   },
+
+  // Phone-a-Friend
+  "Solution Checker|Phone-a-Friend": {
+    use: "Nudge. Nudge.. Nudge... AHA!",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "JeffGamer Puzzle|Phone-a-Friend": {
+    use: "Your friend solves it instantly!",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "GPS Drift|Phone-a-Friend": {
+    use: "Your friend gives you a helpful hint.",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "False Trail Sign|Phone-a-Friend": {
+    use: "Your friend listens to you rant in frustration.",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "Park Ranger|Phone-a-Friend": {
+    use: "You fake a phone call to act normal. Enemy feels bad for misjudging the situation.",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "Mall Cop|Phone-a-Friend": {
+    use: "You fake a phone call to act normal. Enemy feels bad for misjudging the situation.",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+  "Chatty Tourist|Phone-a-Friend": {
+    use: "You call your friend to pass the time. The Enemy's patience wears down.",
+    hit: "TODO",
+    defeat: "TODO"
+  },
+
 };
 
   // ===== 5-Boss Final Challenge =====
@@ -233,32 +273,71 @@ const REACTIONS = {
   }
 
   // ========= Combat =========
+  // function reactLine(enemyName, moveName, phase, fallback) {
+  //   const key = `${enemyName}|${moveName}`;
+  //   const r = REACTIONS[key];
+  //   if (!r) return fallback;
+  //   if (typeof r === "string") return "You use ${moveName}!" + r;           // simple one-liner covers all phases
+  //   return r[phase] || fallback;                   // phase-specific ("use" | "hit" | "miss" | "defeat")
+  // }
+
+  function reactLine(enemyName, moveName, phase, fallback) {
+    const key = `${enemyName}|${moveName}`;
+    const r = REACTIONS[key];
+    const prefix = `You use ${moveName}! `;
+
+    // Helper: strip any existing leading "You use XYZ!" to avoid duplicates
+    const stripDupPrefix = s => s.replace(/^You use .*?!\s*/i, '');
+
+    if (!r) {
+      return prefix + stripDupPrefix(fallback);
+    }
+
+    if (typeof r === "string") {
+      return prefix + stripDupPrefix(r);
+    }
+
+    // phase-specific ("use" | "hit" | "miss" | "defeat")
+    const line = r[phase] || fallback;
+    return prefix + stripDupPrefix(line);
+  }
+
+
   function performMove(moveId){
     const m = MOVES[moveId];
     const base = m.power;
-    let mult = 1;
-    if(state.isBoss){ mult = (m.name===state.enemy.correct) ? 10 : 1; }
+    const isBoss = state.isBoss;
+    const correct = isBoss && (m.name === state.enemy.correct);
 
-    log(`You use ${m.name}! ${m.quip}`);
-    if(state.isBoss){
-      if(mult>1) log(`It’s SUPER effective! (x${mult})`);
-      else log(`It’s not the right technique… (x${mult})`);
+    // Use line (printed instead of the generic quip, but with fallback)
+    log( reactLine(state.enemy.name, m.name, "use", `You use ${m.name}! ${m.quip}`) );
+
+    // Damage multiplier / feedback
+    let mult = 1;
+    if (isBoss) mult = correct ? 10 : 1;   // your current boss rule
+
+    if (isBoss) {
+      log( correct
+        ? reactLine(state.enemy.name, m.name, "hit", `It’s SUPER effective! (x${mult})`)
+        : reactLine(state.enemy.name, m.name, "miss", `It’s not the right technique… (x${mult})`)
+      );
     }
 
-    const dmg = Math.max(1, Math.floor(base*mult));
-    state.enemy.hp -= dmg; if(state.enemy.hp<0) state.enemy.hp=0; el.eHP.textContent = state.enemy.hp;
+    const dmg = Math.max(1, Math.floor(base * mult));
+    state.enemy.hp = Math.max(0, state.enemy.hp - dmg);
+    el.eHP.textContent = state.enemy.hp;
     log(`→ ${state.enemy.name} takes ${dmg} damage. (HP now ${state.enemy.hp})`);
 
-    if(state.enemy.hp<=0){
-      // If boss and correct move, record the move id used to defeat
-      if(state.isBoss && m.name===state.enemy.correct){
-        state.bossHistory.push(moveId);
-      }
-      endBattle(true); return;
+    if (state.enemy.hp <= 0) {
+      if (isBoss && correct) state.bossHistory.push(moveId);
+      // Defeat line can be customized too:
+      //log( reactLine(state.enemy.name, m.name, "defeat", `${state.enemy.name} defeated!`) );
+      endBattle(true);
+      return;
     }
 
-    // Enemy counterattack
-    if(state.isBoss && m.name!==state.enemy.correct){
+    // Enemy counterattack as you already have it:
+    if (isBoss && !correct) {
       state.player.hp = 0;
       log(`${state.enemy.name} unleashes a catastrophic counter! You are forced to log a DNF.`);
     } else {
@@ -266,9 +345,46 @@ const REACTIONS = {
       log(`→ ${state.enemy.name} hits back for ${state.enemy.power}! (Your HP ${Math.max(0,state.player.hp)}/${state.player.maxhp})\nWhat will you do?`);
     }
 
-    if(state.player.hp<=0){ endBattle(false); return; }
+    if (state.player.hp <= 0) { endBattle(false); return; }
     paintStats();
   }
+
+  // function performMove(moveId){
+  //   const m = MOVES[moveId];
+  //   const base = m.power;
+  //   let mult = 1;
+  //   if(state.isBoss){ mult = (m.name===state.enemy.correct) ? 10 : 1; }
+
+  //   log(`You use ${m.name}! ${m.quip}`);
+  //   if(state.isBoss){
+  //     if(mult>1) log(`It’s SUPER effective! (x${mult})`);
+  //     else log(`It’s not the right technique… (x${mult})`);
+  //   }
+
+  //   const dmg = Math.max(1, Math.floor(base*mult));
+  //   state.enemy.hp -= dmg; if(state.enemy.hp<0) state.enemy.hp=0; el.eHP.textContent = state.enemy.hp;
+  //   log(`→ ${state.enemy.name} takes ${dmg} damage. (HP now ${state.enemy.hp})`);
+
+  //   if(state.enemy.hp<=0){
+  //     // If boss and correct move, record the move id used to defeat
+  //     if(state.isBoss && m.name===state.enemy.correct){
+  //       state.bossHistory.push(moveId);
+  //     }
+  //     endBattle(true); return;
+  //   }
+
+  //   // Enemy counterattack
+  //   if(state.isBoss && m.name!==state.enemy.correct){
+  //     state.player.hp = 0;
+  //     log(`${state.enemy.name} unleashes a catastrophic counter! You are forced to log a DNF.`);
+  //   } else {
+  //     state.player.hp -= state.enemy.power;
+  //     log(`→ ${state.enemy.name} hits back for ${state.enemy.power}! (Your HP ${Math.max(0,state.player.hp)}/${state.player.maxhp})\nWhat will you do?`);
+  //   }
+
+  //   if(state.player.hp<=0){ endBattle(false); return; }
+  //   paintStats();
+  // }
 
   // ========= Progression =========
   function levelCheck(){
